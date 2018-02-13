@@ -2,12 +2,12 @@ html {
 }
 
 .Header {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 60px;
- }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+}
 
 .Drawer {
   position: fixed;
@@ -18,7 +18,7 @@ html {
   height: 100%;
 }
 
-.Drawer::before {
+.Drawer-backdrop {
   position: absolute;
   z-index: -1;
   top: 0;
@@ -26,7 +26,6 @@ html {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  content: "";
 }
 
 .Drawer-nav {
@@ -46,7 +45,7 @@ html {
   transition-duration: 0.25s;
 }
 
-.Drawer[aria-expanded]::before {
+.Drawer[aria-expanded] .Drawer-backdrop {
   transition-property: opacity;
   transition-duration: 0.25s;
   transition-timing-function: linear;
@@ -58,11 +57,12 @@ html {
   transition-timing-function: ease;
 }
 
+/* 開いているとき */
 .Drawer[aria-expanded="true"] {
   visibility: visible;
 }
 
-.Drawer[aria-expanded="true"]::before {
+.Drawer[aria-expanded="true"] .Drawer-backdrop {
   opacity: 1;
 }
 
@@ -70,11 +70,12 @@ html {
   transform: translateX(0);
 }
 
+/* 閉じているとき */
 .Drawer[aria-expanded="false"] {
   visibility: hidden;
 }
 
-.Drawer[aria-expanded="false"]::before {
+.Drawer[aria-expanded="false"] .Drawer-backdrop {
   opacity: 0;
 }
 

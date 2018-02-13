@@ -3,56 +3,46 @@
   const openButton = document.querySelector(".js-openDrawer");
   const drawer = document.querySelector(".js-drawer");
   const closeButton = drawer.querySelector(".js-closeDrawer");
+  const backdrop = drawer.querySelector(".js-backdrop");
 
   // 現在の状態（開いていたらtrue）
-  let currentState = false;
+  let drawerOpen = false;
 
-  // valueはtrue/false
-  function changeAriaExpanded(value) {
+  // stateは真偽値
+  function changeAriaExpanded(state) {
+    const value = state ? "true" : "false";
     drawer.setAttribute("aria-expanded", value);
     openButton.setAttribute("aria-expanded", value);
     closeButton.setAttribute("aria-expanded", value);
   }
 
-  function getNextState(state) {
-    const status = {
-      open: true,
-      close: false,
-    };
-    const nextState = status[state];
-    if (nextState === undefined) {
-      console.log("changeState()のパラメータがおかしいです");
-    }
-    return nextState;
-  }
-
-  // stateは文字列の"open"/"close"
+  // stateは真偽値
   function changeState(state) {
-    const nextState = getNextState(state);
-    if (nextState === currentState) {
+    if(state === drawerOpen) {
       console.log("2回以上連続で同じ状態に変更しようとしました");
       return;
     }
-    currentState = nextState;
-    changeAriaExpanded(nextState);
+    changeAriaExpanded(state);
+    drawerOpen = state;
+  }
+
+  function openDrawer() {
+    changeState(true);
+  }
+
+  function closeDrawer() {
+    changeState(false);
   }
 
   function onClickOpenButton() {
-    changeState("open");
+    openDrawer();
   }
 
   function onClickCloseButton() {
-    changeState("close");
-  }
-
-  function onClickBackdrop(event) {
-    if(event.target !== drawer) {
-      return;
-    }
-    changeState("close");
+    closeDrawer();
   }
 
   openButton.addEventListener("click", onClickOpenButton, false);
   closeButton.addEventListener("click", onClickCloseButton, false);
-  drawer.addEventListener("click", onClickBackdrop, false);
+  backdrop.addEventListener("click", onClickCloseButton, false);
 })();
