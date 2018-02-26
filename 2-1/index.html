@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>drawer nav demo phase 1</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="Header">
+  <h1 class="Header-logo">Logo</h1>
+  <button type="button" class="Header-button js-openDrawer" aria-controls="drawer" aria-expanded="false">
+    <img src="../assets/open.svg" class="Header-button-image" alt="ナビゲーションを開く" width="24" height="18">
+  </button>
+</header>
+<div id="drawer" class="Drawer js-drawer" aria-expanded="false">
+  <div class="Drawer-backdrop js-backdrop"></div>
+  <nav class="Drawer-nav Nav">
+    <button type="button" class="Nav-button js-closeDrawer" aria-controls="drawer" aria-expanded="false">
+      <img src="../assets/close.svg" class="Nav-button-image" alt="ナビゲーションを閉じる" width="18" height="18">
+    </button>
+    <ul class="Nav-list">
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 1</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 2</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 3</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 4</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 5</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 6</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 7</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 8</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 9</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 10</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 11</a>
+      </li>
+      <li class="Nav-item">
+        <a href="#" class="Nav-link">アイテム 12</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+<main class="Main">
+  <section class="Main-item Content">
+    <h2 class="Content-title">Section 1</h2>
+    <p class="Content-text">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+    <ul class="Content-list LinkList">
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">Lorem ipsum</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">dolor sit amet</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">consectetur adipiscing elit</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">sed do eiusmod tempor</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">incididunt ut labore</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">et dolore magna aliqua</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">Ut enim ad minim veniam</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">quis nostrud</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">exercitation ullamco</a>
+      </li>
+      <li class="LinkList-item">
+        <a href="#" class="LinkList-link">laboris nisi ut aliquip</a>
+      </li>
+    </ul>
+    <p class="Content-text">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+  </section>
+  <section class="Main-item Content">
+    <h2 class="Content-title">Section 2</h2>
+    <form action="" class="Content-form Form">
+      <p class="Form-item">
+        <label for="name" class="Form-label">名前</label>
+        <input type="text" id="name" class="Form-inputText" placeholder="John Smith">
+      </p>
+      <p class="Form-item">
+        <label for="email" class="Form-label">メール</label>
+        <input type="email" id="email" class="Form-inputText" placeholder="email@example.com">
+      </p>
+      <p class="Form-item">
+        <label for="message" class="Form-label">メッセージ</label>
+        <textarea id="message" class="Form-textarea" placeholder="Hello."></textarea>
+      </p>
+      <p class="Form-item">
+        <button type="submit" class="Form-submit">Submit</button>
+      </p>
+    </form>
+  </section>
+  <section class="Main-item Content">
+    <h2 class="Content-title">Section 3</h2>
+    <p class="Content-text">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+  </section>
+</main>
+<footer class="Footer">
+  <p class="Footer-text">Footer text.</p>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
