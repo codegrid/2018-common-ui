@@ -74,7 +74,7 @@
       appendImageItem(this.src);
       updateCount();
     };
-    img.src = url;
+    img.src = url + "?t=" + Date.now();
   }
 
   function loadAllImages() {
