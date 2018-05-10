@@ -78,8 +78,8 @@
   }
 
   function loadAllImages() {
-    imagesList.forEach(function (value) {
-      loadImage(value);
+    imagesList.forEach(function (url) {
+      loadImage(url);
     })
   }
 
