@@ -1,0 +1,101 @@
+html {
+  overflow-y: scroll;
+}
+
+html.drawerOpen {
+  overflow: hidden;
+}
+
+.Header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 60px;
+}
+
+.Drawer {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.Drawer-backdrop {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.Drawer-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 280px;
+}
+
+.Nav {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.Drawer[aria-expanded] {
+  transition-property: visibility;
+  transition-duration: 0.25s;
+}
+
+.Drawer[aria-expanded] .Drawer-backdrop {
+  transition-property: opacity;
+  transition-duration: 0.25s;
+  transition-timing-function: linear;
+}
+
+.Drawer[aria-expanded] .Drawer-nav {
+  transition-property: transform;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+
+/* 開いているとき */
+.Drawer[aria-expanded="true"] {
+  visibility: visible;
+  transition-duration: 0s;
+}
+
+.Drawer[aria-expanded="true"] .Drawer-backdrop {
+  opacity: 1;
+}
+
+.Drawer[aria-expanded="true"] .Drawer-nav {
+  transform: translateX(0);
+}
+
+/* 閉じているとき */
+.Drawer[aria-expanded="false"] {
+  visibility: hidden;
+}
+
+.Drawer[aria-expanded="false"] .Drawer-backdrop {
+  opacity: 0;
+}
+
+.Drawer[aria-expanded="false"] .Drawer-nav {
+  transform: translateX(100%);
+}
+
+.Main-item::before {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  top: -60px;
+  height: 60px;
+  width: 100%;
+  content: "";
+}
