@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ネイティブUIのセレクトボックス - 英語での都道府県選択</title>
+</head>
+<body>
+
+<div class="Stage"></div>
+
+<script type="module">
+import { prefectures } from "../assets/prefectures.js";
+
+const stage = document.querySelector(".Stage");
+
+const select = document.createElement("select");
+select.setAttribute("name", "prefecture");
+
+for (const region of prefectures) {
+  for (const {en, value} of region.items) {
+    const option = document.createElement("option");
+    option.setAttribute("value", value);
+    option.textContent = en;
+    select.appendChild(option);
+  }
+}
+
+stage.appendChild(select);
+</script>
+</body>
+</html>
