@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>セレクトUIのカスタム - 都道府県選択</title>
+  <style>
+  body {
+    background-color: white;
+    font-family: sans-serif;
+  }
+
+  .CustomSelect {
+    position: relative;
+    display: inline-block;
+    font-size: 1rem;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .CustomSelect-input,
+  .CustomSelect-output {
+    font: inherit;
+  }
+
+  .CustomSelect-input {
+    opacity: 0;
+  }
+
+  .CustomSelect-output {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    white-space: nowrap;
+    user-select: none;
+
+    /* 装飾関係 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25em;
+    border-width: 1px;
+    border-style: solid;
+    border-color: gray;
+    border-radius: 2px;
+    padding-inline: 0.25em;
+  }
+
+  /* 装飾 */
+  .CustomSelect-output::after {
+    content: "▽";
+  }
+
+  .CustomSelect-input:focus-visible + .CustomSelect-output {
+    outline: 3px solid dodgerblue;
+    outline-offset: 2px;
+  }
+  </style>
+</head>
+<body>
+
+<form>
+  <p>
+    <label for="prefecture_ja">都道府県を選択</label>
+    <span class="CustomSelect js-customSelect"></span>
+  </p>
+  <p>
+    <button>送信</button>
+  </p>
+</form>
+
+<script type="module">
+import { prefectures } from "../assets/prefectures.js";
+
+const container = document.querySelector(".CustomSelect");
+
+const select = document.createElement("select");
+select.id = "prefecture_ja";
+select.classList.add("CustomSelect-input", "js-customSelectInput");
+select.setAttribute("name", "prefecture_ja");
+
+const output = document.createElement("span");
+output.classList.add("CustomSelect-output", "js-customSelectOutput");
+output.setAttribute("aria-hidden", "true");
+
+for (const region of prefectures) {
+  for (const {ja, value} of region.items) {
+    const option = document.createElement("option");
+    option.setAttribute("value", value);
+    option.textContent = ja;
+    select.appendChild(option);
+  }
+}
+
+container.appendChild(select);
+container.appendChild(output);
+</script>
+<script type="module">
+const targets = document.querySelectorAll(".js-customSelect");
+targets.forEach(customSelect);
+
+function customSelect(component) {
+  const select = component.querySelector(".js-customSelectInput");
+  const output = component.querySelector(".js-customSelectOutput");
+
+  if (!select || !output) {
+    return;
+  }
+
+  select.addEventListener("change", reflectSelected);
+  reflectSelected();
+
+  function reflectSelected() {
+    const index = select.selectedIndex;
+    output.textContent = select[index].textContent;
+  }
+}
+</script>
+</body>
+</html>
