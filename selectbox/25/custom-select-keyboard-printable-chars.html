@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カスタムセレクトボックスのキーボード操作 6</title>
+  <style>
+  body {
+    background-color: white;
+    font-family: sans-serif;
+  }
+
+  .CustomSelect {
+    position: relative;
+    display: inline-block;
+    font-size: 1rem;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .CustomSelect-input {
+    position: relative;
+    border-width: 1px;
+    border-style: solid;
+    border-color: gray;
+    border-radius: 2px;
+    padding-inline-start: 0.5em;
+    padding-inline-end: 1.25em;
+    width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: transparent;
+    font: inherit;
+    line-height: 1.5;
+    text-align: start;
+    white-space: nowrap;
+  }
+
+  .CustomSelect-input::after {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.25em;
+    margin-block: auto;
+    box-sizing: border-box;
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    width: 0.5em;
+    height: 0.5em;
+    translate: -0.1em -0.1em;
+    rotate: -45deg;
+    content: "";
+  }
+
+  .CustomSelect-input:focus-visible {
+    outline: 3px solid dodgerblue;
+    outline-offset: 2px;
+  }
+
+  .CustomSelect-listBox {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: calc(100% + 0.25em);
+    inset-inline-start: 0;
+    margin: 0;
+    border-width: 1px;
+    border-style: solid;
+    border-color: silver;
+    border-radius: 2px;
+    padding: 0;
+    min-width: 100%;
+    max-height: calc(1.5em * 10);
+    overflow: auto;
+    visibility: hidden;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.25);
+    background-color: white;
+    list-style-type: none;
+  }
+
+  .CustomSelect-listBox.expanded {
+    visibility: visible;
+  }
+
+  .CustomSelect-option {
+    position: relative;
+    box-sizing: border-box;
+    border-width: 0;
+    padding-inline-start: 0.5em;
+    padding-inline-end: 1.25em;
+    width: 100%;
+    background-color: transparent;
+    font: inherit;
+    line-height: 1.5;
+    text-align: start;
+    white-space: nowrap;
+  }
+
+  .CustomSelect-option.visuallyFocused {
+    outline: 2px solid black;
+    outline-offset: -2px;
+  }
+
+  .CustomSelect-option:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .CustomSelect-option::after {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.25em;
+    margin-block: auto;
+    box-sizing: border-box;
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    width: 0.5em;
+    height: 0.3em;
+    translate: -0.1em -0.1em;
+    rotate: -45deg;
+    content: "";
+    opacity: 0;
+  }
+
+  .CustomSelect-option[aria-selected="true"]::after {
+    opacity: 1;
+  }
+  </style>
+</head>
+<body>
+
+<form>
+  <div>
+    <label for="prefecture_ja" id="selectPrefectureLabel">都道府県を選択</label>
+    <div class="CustomSelect js-customSelect">
+      <input type="hidden" name="prefecture_ja" value="">
+      <button
+        type="button"
+        id="prefecture_ja"
+        class="CustomSelect-input"
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="prefectureSelectListBox"
+      >
+        選択してください
+      </button>
+      <ul
+        id="prefectureSelectListBox"
+        class="CustomSelect-listBox"
+        role="listbox"
+        aria-labelledby="selectPrefectureLabel"
+      ></ul>
+    </div>
+  </div>
+  <p>
+    <button type="submit">送信</button>
+  </p>
+</form>
+
+<script type="module">
+import { prefectures } from "../assets/prefectures.js";
+
+const container = document.querySelector(".CustomSelect-listBox");
+const fragment = document.createDocumentFragment();
+
+for (const region of prefectures) {
+  for (const {en, value} of region.items) {
+    const li = document.createElement("li");
+    const option = document.createElement("button");
+    li.setAttribute("role", "none")
+    li.classList.add("CustomSelect-item");
+    option.type = "button";
+    option.id = `prefecture-${value}`;
+    option.classList.add("CustomSelect-option");
+    option.value = value;
+    option.tabIndex = -1;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", "false");
+    option.textContent = en;
+    li.appendChild(option);
+    fragment.appendChild(li);
+  }
+}
+
+container.appendChild(fragment);
+</script>
+
+<script type="module">
+class CustomSelect {
+  constructor(root) {
+    this.elements = {
+      root,
+      inputHidden: root.querySelector("input[type='hidden']"),
+      trigger: root.querySelector("[role='combobox']"),
+      menu: root.querySelector("[role='listbox']"),
+    }
+
+    this.menuExpanded = false;
+    this.selectedOption = null;
+    this.selectedOptionIndex = -1;
+    this.visuallyFocusedIndex = -1;
+    this.searchText = "";
+
+    this.onClickSelect = this.onClickSelectTrigger.bind(this);
+    this.onClickSelectOption = this.onClickSelectOptionTarget.bind(this);
+    this.onKeyDown = this.onKeyDownSelectTrigger.bind(this);
+
+    this.init();
+  }
+
+  setSelectOptions() {
+    const options = this.elements.menu.querySelectorAll("[role='option']:not(:disabled)");
+    this.selectOptions = Array.from(options);
+  }
+
+  collapseMenu() {
+    const {trigger, menu} = this.elements;
+    trigger.setAttribute("aria-expanded", "false");
+    menu.classList.remove("expanded");
+    trigger.removeAttribute("aria-activedescendant");
+    this.menuExpanded = false;
+  }
+
+  expandMenu() {
+    const {trigger, menu} = this.elements;
+    trigger.setAttribute("aria-expanded", "true");
+    menu.classList.add("expanded");
+    this.menuExpanded = true;
+  }
+
+  isPrintableCharacter(event) {
+    const {key, altKey, ctrlKey, metaKey} = event;
+    return (key.length === 1 && key !== " " && !altKey && !ctrlKey && !metaKey) || key === "Backspace";
+  }
+
+  getSearchText(char) {
+    if (this.searchTextTimeout) {
+      clearTimeout(this.searchTextTimeout);
+    }
+    this.searchTextTimeout = setTimeout(() => {
+      this.searchText = "";
+    }, 500);
+    if (char === "Backspace") {
+      this.searchText = this.searchText.slice(0, -1);
+    } else if (this.searchText !== char) {
+      this.searchText = this.searchText + char;
+    }
+    return this.searchText;
+  }
+
+  getOptionIndexBySearchText(text, startIndex) {
+    const options = this.selectOptions;
+    const targetOptions = [
+      ...options.slice(startIndex),
+      ...options.slice(0, startIndex),
+    ]
+    const textFormatted = text.toLowerCase();
+    const targetOption = targetOptions.find(option => {
+      return option.textContent.trim().toLowerCase().startsWith(textFormatted);
+    });
+    return options.indexOf(targetOption);
+  }
+
+  expandMenuByKeyboard(event) {
+    const {key} = event;
+    const simpleExpandKeys = ["ArrowDown", "ArrowUp", "Enter", " "];
+    const targetKeys = [...simpleExpandKeys, "Home", "End"];
+    const isPrintableChar = this.isPrintableCharacter(event);
+    if (targetKeys.indexOf(key) < 0 && !isPrintableChar) {
+      return;
+    }
+
+    event.preventDefault();
+    let targetIndex;
+    if (simpleExpandKeys.indexOf(key) > -1) {
+      targetIndex = this.selectedOptionIndex;
+    } else if (key === "Home") {
+      targetIndex = 0;
+    } else if (key === "End") {
+      targetIndex = this.selectOptions.length - 1
+    } else if (isPrintableChar) {
+      const searchText = this.getSearchText(key);
+      if (!searchText) {
+        return;
+      }
+      targetIndex = this.getOptionIndexBySearchText(searchText, this.selectedOptionIndex);
+    }
+
+    this.expandMenu();
+    if (targetIndex > -1) {
+      this.changeVisuallyFocusedOption(targetIndex);
+    }
+  }
+
+  menuControlByKeyboard(event) {
+    const {key} = event;
+    const moveKeys = ["ArrowDown", "Home", "End", "PageUp", "PageDown"];
+    const selectKeys = ["Enter", " ", "Tab"];
+    const isPrintableChar = this.isPrintableCharacter(event);
+
+    if (moveKeys.indexOf(key) > -1 || (key === "ArrowUp" && !event.altKey)) {
+      event.preventDefault();
+      const nextVisuallyFocusedIndex = this.getNextVisuallyFocusedIndex(key);
+      if (nextVisuallyFocusedIndex !== this.visuallyFocusedIndex) {
+        this.changeVisuallyFocusedOption(nextVisuallyFocusedIndex);
+      }
+      return;
+    }
+    if (selectKeys.indexOf(key) > -1 || (key === "ArrowUp" && event.altKey)) {
+      if (key !== "Tab") {
+        event.preventDefault();
+      }
+      const targetOption = this.selectOptions[this.visuallyFocusedIndex];
+      this.changeSelectedOption(targetOption);
+      this.collapseMenu();
+      return;
+    }
+    if (key === "Escape") {
+      this.collapseMenu();
+      return;
+    }
+    if (isPrintableChar) {
+      const searchText = this.getSearchText(key);
+      if (!searchText) {
+        return;
+      }
+      const targetIndex = this.getOptionIndexBySearchText(searchText, this.visuallyFocusedIndex + 1);
+      if (targetIndex > -1) {
+        this.changeVisuallyFocusedOption(targetIndex);
+      }
+    }
+  }
+
+  getNextVisuallyFocusedIndex(key) {
+    const currentIndex = this.visuallyFocusedIndex;
+    const lastIndex = this.selectOptions.length - 1;
+    let nextIndex;
+
+    switch (key) {
+      case "ArrowDown":
+        nextIndex = currentIndex + 1;
+        break;
+      case "ArrowUp":
+        nextIndex = currentIndex - 1;
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = lastIndex;
+        break;
+      case "PageUp":
+        nextIndex = currentIndex - 10;
+        break;
+      case "PageDown":
+        nextIndex = currentIndex + 10;
+        break;
+    }
+
+    if (nextIndex < 0) {
+      nextIndex = 0;
+    } else if (nextIndex > lastIndex) {
+      nextIndex = lastIndex;
+    }
+    return nextIndex;
+  }
+
+  changeSelectedOption(selectOption) {
+    if (this.selectedOption) {
+      this.selectedOption.setAttribute("aria-selected", "false");
+    }
+    const {inputHidden, trigger} = this.elements;
+    inputHidden.value = selectOption.value;
+    trigger.textContent = selectOption.textContent;
+    selectOption.setAttribute("aria-selected", "true");
+    this.selectedOption = selectOption;
+    this.selectedOptionIndex = this.selectOptions.indexOf(selectOption);
+  }
+
+  changeVisuallyFocusedOption(index) {
+    if (this.visuallyFocusedIndex > -1) {
+      this.selectOptions[this.visuallyFocusedIndex].classList.remove("visuallyFocused");
+    }
+    const targetOption = this.selectOptions[index];
+    targetOption.classList.add("visuallyFocused");
+    this.elements.trigger.setAttribute("aria-activedescendant", targetOption.id);
+    targetOption.scrollIntoView({block: "nearest"});
+    this.visuallyFocusedIndex = index;
+  }
+
+  onClickSelectTrigger() {
+    if (this.menuExpanded) {
+      this.collapseMenu();
+    } else {
+      this.expandMenu();
+    }
+  }
+
+  onClickSelectOptionTarget(event) {
+    event.preventDefault();
+    const clickedOption = event.target.closest("[role='option']");
+    if (!clickedOption || clickedOption === this.selectedOption) {
+      return;
+    }
+    this.changeSelectedOption(clickedOption);
+    this.collapseMenu();
+  }
+
+  onKeyDownSelectTrigger(event) {
+    if (!this.menuExpanded) {
+      this.expandMenuByKeyboard(event);
+    } else {
+      this.menuControlByKeyboard(event);
+    }
+  }
+
+  attachHandlers() {
+    const {trigger, menu} = this.elements;
+    trigger.addEventListener("click", this.onClickSelect);
+    trigger.addEventListener("keydown", this.onKeyDown);
+    menu.addEventListener("click", this.onClickSelectOption);
+  }
+
+  initialSelect() {
+    const selectOptions = this.selectOptions;
+    if (!selectOptions.length) {
+      return;
+    }
+    const selected = selectOptions.find((option) => {
+      return option.getAttribute("aria-selected") === "true";
+    });
+    const selectTarget = selected || selectOptions[0];
+    this.changeSelectedOption(selectTarget);
+  }
+
+  init() {
+    this.setSelectOptions();
+    this.attachHandlers();
+    this.initialSelect();
+  }
+}
+
+const targets = document.querySelectorAll(".js-customSelect");
+targets.forEach((componentRoot) => {
+  new CustomSelect(componentRoot);
+});
+</script>
+</body>
+</html>
