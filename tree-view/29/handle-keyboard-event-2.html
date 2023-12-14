@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツリービュー：上下カーソルキーによる操作</title>
+  <style>
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .TreeView,
+  .TreeView-subtree {
+    padding-inline-start: 0;
+    list-style-type: none;
+  }
+
+  .TreeView-subtree {
+    --subtree-depth: 1;
+  }
+
+  .TreeView-node[aria-expanded="false"] > .TreeView-subtree {
+    display: none;
+  }
+
+  .TreeView-node:focus-visible {
+    outline: 0;
+  }
+
+  .TreeView-node:focus-visible > .TreeView-nodeName {
+    outline: 3px solid tomato;
+  }
+
+  .TreeView-node[aria-selected="true"] > .TreeView-nodeName {
+    background-color: lightblue;
+  }
+
+  .TreeView-nodeName {
+    display: flex;
+    column-gap: 0.25em;
+    padding-inline-start: calc(1.5em * var(--subtree-depth));
+    font-size: 1em;
+    line-height: 1.5;
+  }
+
+  .TreeView-nodeName::before {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    clip-path: polygon(25% 25%, 25% 75%, 75% 75%, 75% 25%);
+    translate: 0 0.25em;
+    background-color: currentcolor;
+    content: "";
+  }
+
+  .TreeView-node[aria-expanded] > .TreeView-nodeName::before {
+    clip-path: polygon(10% 10%, 10% 90%, 90% 50%);
+  }
+
+  .TreeView-node[aria-expanded="true"] > .TreeView-nodeName::before {
+    rotate: 90deg;
+  }
+  </style>
+</head>
+<body>
+
+<ul role="tree" class="TreeView js-treeView">
+  <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="0" class="TreeView-node">
+    <div class="TreeView-nodeName js-trigger">ノード 1</div>
+    <ul role="group" class="TreeView-subtree">
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 1.1</div>
+      </li>
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 1.2</div>
+      </li>
+      <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName js-trigger">ノード 1.3</div>
+        <ul role="group" class="TreeView-subtree">
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">ノード 1.3.1</div>
+          </li>
+          <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName js-trigger">ノード 1.3.2</div>
+            <ul role="group" class="TreeView-subtree">
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">ノード 1.3.2.1</div>
+              </li>
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">ノード 1.3.2.2</div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 1.4</div>
+      </li>
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 1.5</div>
+      </li>
+    </ul>
+  </li>
+  <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName js-trigger">ノード 2</div>
+    <ul role="group" class="TreeView-subtree">
+      <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName js-trigger">ノード 2.1</div>
+        <ul role="group" class="TreeView-subtree">
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">ノード 2.1.1</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">ノード 2.1.2</div>
+          </li>
+        </ul>
+      </li>
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 2.2</div>
+      </li>
+    </ul>
+  </li>
+  <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName js-trigger">ノード 3</div>
+    <ul role="group" class="TreeView-subtree">
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">ノード 3.1</div>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<script>
+class TreeView {
+  constructor(root) {
+    this.elements = {
+      root,
+      nodes: [...root.querySelectorAll("[role='treeitem']")],
+      subtrees: root.querySelectorAll("[role='group']"),
+    }
+
+    this.seletedIndex = -1;
+    this.tabbabledIndex = -1;
+
+    this.onClickTrigger = this.onClickNode.bind(this);
+    this.onKeydownItem = this.onKeydownNode.bind(this);
+
+    this.init();
+  }
+
+  getSubtreeDepth(subtree) {
+    let depth = 0;
+    let current = subtree;
+    while (current !== this.elements.root) {
+      if (current.getAttribute("role") === "group") {
+        depth++;
+      }
+      current = current.parentElement;
+    }
+    return depth;
+  }
+
+  expandSubtree(node) {
+    node.setAttribute("aria-expanded", "true");
+  }
+
+  collapseSubtree(node) {
+    node.setAttribute("aria-expanded", "false");
+  }
+
+  onClickNode(event) {
+    const node = event.target.closest("[role='treeitem']");
+    if (!node) {
+      return;
+    }
+    const nodeIndex = this.elements.nodes.indexOf(node);
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+    this.updateSelectedIndex(nodeIndex);
+    this.updateTabbableIndex(nodeIndex);
+  }
+
+  onKeydownNode(event) {
+    const node = event.target.closest("[role='treeitem']");
+    if (!node) {
+      return;
+    }
+
+    const {key} = event;
+    const index = this.elements.nodes.indexOf(node);
+
+    switch (key) {
+      case "ArrowRight":
+        this.handleArrowRight(node, index);
+        break;
+      case "ArrowLeft":
+        this.handleArrowLeft(node);
+        break;
+      case "ArrowDown":
+        this.handleArrowUpDown(index);
+        break;
+      case "ArrowUp":
+        this.handleArrowUpDown(index, true);
+        break;
+      case "Home":
+        break;
+      case "End":
+        break;
+      case "Enter":
+      case " ":
+        break;
+      case "*":
+        break;
+    }
+  }
+
+  handleArrowRight(node, index) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      const nextIndex = index + 1;
+      this.elements.nodes[nextIndex].focus();
+      this.updateTabbableIndex(nextIndex);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+  }
+
+  handleArrowLeft(node) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    const parentNode = node.parentElement.closest("[role='treeitem']");
+
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+      return;
+    }
+
+    if (parentNode) {
+      const parentNodeIndex = this.elements.nodes.indexOf(parentNode);
+      parentNode.focus();
+      this.updateTabbableIndex(parentNodeIndex);
+    }
+  }
+
+  handleArrowUpDown(index, up = false) {
+    const {nodes} = this.elements;
+    const selector = ":not([aria-expanded='false'] [role='treeitem'])";
+    const nextFocusableIndex = up ? this.getPreviousFocusableIndex(nodes, index, selector) : this.getNextFocusableIndex(nodes, index, selector);
+
+    if (nextFocusableIndex > -1) {
+      nodes[nextFocusableIndex].focus();
+      this.updateTabbableIndex(nextFocusableIndex);
+    }
+  }
+
+  getNextFocusableIndex(nodes, baseIndex, selector) {
+    return nodes.findIndex((node, index) => {
+      return index > baseIndex && node.matches(selector)
+    })
+  }
+
+  getPreviousFocusableIndex(nodes, baseIndex, selector) {
+    return nodes.findLastIndex((node, index) => {
+      return index < baseIndex && node.matches(selector)
+    })
+  }
+
+  updateSelectedIndex(index) {
+    const {nodes} = this.elements;
+    if (index < 0) {
+      return;
+    }
+    if (this.seletedIndex > -1) {
+      nodes[this.seletedIndex].setAttribute("aria-selected", "false");
+    }
+    nodes[index].setAttribute("aria-selected", "true");
+    this.seletedIndex = index;
+  }
+
+  updateTabbableIndex(index) {
+    const {nodes} = this.elements;
+    if (index < 0) {
+      return;
+    }
+    if (this.tabbabledIndex > -1) {
+      nodes[this.tabbabledIndex].setAttribute("tabindex", "-1");
+    }
+    nodes[index].setAttribute("tabindex", "0");
+    this.tabbabledIndex = index;
+  }
+
+  attachEvents() {
+    const {root} = this.elements;
+    root.addEventListener("click", this.onClickTrigger);
+    root.addEventListener("keydown", this.onKeydownItem);
+  }
+
+  initNestedStyle() {
+    for (const subtree of this.elements.subtrees) {
+      const depth = this.getSubtreeDepth(subtree);
+      subtree.style.setProperty("--subtree-depth", depth.toString());
+    }
+  }
+
+  initProps() {
+    const {nodes} = this.elements;
+    const selectedNodeIndex = nodes.findIndex((node) => node.getAttribute("aria-selected") === "true");
+    const tabbableNodeIndex = nodes.findIndex((node) => node.getAttribute("tabindex") === "0");
+    this.seletedIndex = selectedNodeIndex;
+    this.tabbabledIndex = tabbableNodeIndex < 0 ? 0 : tabbableNodeIndex;
+    this.updateSelectedIndex(this.seletedIndex);
+    this.updateTabbableIndex(this.tabbabledIndex);
+  }
+
+  init() {
+    this.initNestedStyle();
+    this.initProps();
+    this.attachEvents();
+  }
+}
+
+const targets = document.querySelectorAll(".js-treeView");
+targets.forEach((componentRoot) => {
+  new TreeView(componentRoot);
+});
+</script>
+
+</body>
+</html>
