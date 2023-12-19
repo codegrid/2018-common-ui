@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツリービュー：エンターキーとスペースキーの処理</title>
+  <style>
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .TreeView,
+  .TreeView-subtree {
+    padding-inline-start: 0;
+    list-style-type: none;
+  }
+
+  .TreeView-subtree {
+    --subtree-depth: 1;
+  }
+
+  .TreeView-node[aria-expanded="false"] > .TreeView-subtree {
+    display: none;
+  }
+
+  .TreeView-node:focus-visible {
+    outline: 0;
+  }
+
+  .TreeView-node:focus-visible > .TreeView-nodeName {
+    outline: 3px solid tomato;
+  }
+
+  .TreeView-node[aria-selected="true"] > .TreeView-nodeName {
+    background-color: lightblue;
+  }
+
+  .TreeView-nodeName {
+    display: flex;
+    column-gap: 0.25em;
+    padding-inline-start: calc(1.5em * var(--subtree-depth));
+    font-size: 1em;
+    line-height: 1.5;
+  }
+
+  .TreeView-nodeName::before {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    clip-path: polygon(25% 25%, 25% 75%, 75% 75%, 75% 25%);
+    translate: 0 0.25em;
+    background-color: currentcolor;
+    content: "";
+  }
+
+  .TreeView-node[aria-expanded] > .TreeView-nodeName::before {
+    clip-path: polygon(10% 10%, 10% 90%, 90% 50%);
+  }
+
+  .TreeView-node[aria-expanded="true"] > .TreeView-nodeName::before {
+    rotate: 90deg;
+  }
+  </style>
+</head>
+<body>
+
+<ul role="tree" class="TreeView js-treeView">
+  <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="0" class="TreeView-node">
+    <div class="TreeView-nodeName js-trigger">asset</div>
+    <ul role="group" class="TreeView-subtree">
+      <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName js-trigger">css</div>
+        <ul role="group" class="TreeView-subtree">
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">base.css</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">main.css</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">vendor.css</div>
+          </li>
+        </ul>
+      </li>
+      <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName js-trigger">js</div>
+        <ul role="group" class="TreeView-subtree">
+          <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName js-trigger">module</div>
+            <ul role="group" class="TreeView-subtree">
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">analytics.js</div>
+              </li>
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">carousel.js</div>
+              </li>
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">count.js</div>
+              </li>
+              <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+                <div class="TreeView-nodeName">tab.js</div>
+              </li>
+            </ul>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">main.js</div>
+          </li>
+        </ul>
+      </li>
+      <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName js-trigger">image</div>
+        <ul role="group" class="TreeView-subtree">
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">bg.svg</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">logo.svg</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">main.jpg</div>
+          </li>
+          <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+            <div class="TreeView-nodeName">og-default.png</div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li role="treeitem" aria-expanded="false" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName js-trigger">profile</div>
+    <ul role="group" class="TreeView-subtree">
+      <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+        <div class="TreeView-nodeName">index.html</div>
+      </li>
+    </ul>
+  </li>
+  <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName">favicon.ico</div>
+  </li>
+  <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName">index.html</div>
+  </li>
+  <li role="treeitem" aria-selected="false" tabindex="-1" class="TreeView-node">
+    <div class="TreeView-nodeName">robots.txt</div>
+  </li>
+</ul>
+
+<script>
+class TreeView {
+  constructor(root) {
+    this.elements = {
+      root,
+      nodes: [...root.querySelectorAll("[role='treeitem']")],
+      subtrees: root.querySelectorAll("[role='group']"),
+    }
+
+    this.seletedIndex = -1;
+    this.tabbabledIndex = -1;
+
+    this.searchText = "";
+    this.searchTextTimeout = null;
+
+    this.onClickTrigger = this.onClickNode.bind(this);
+    this.onKeydownItem = this.onKeydownNode.bind(this);
+
+    this.init();
+  }
+
+  getSubtreeDepth(subtree) {
+    let depth = 0;
+    let current = subtree;
+    while (current !== this.elements.root) {
+      if (current.getAttribute("role") === "group") {
+        depth++;
+      }
+      current = current.parentElement;
+    }
+    return depth;
+  }
+
+  expandSubtree(node) {
+    node.setAttribute("aria-expanded", "true");
+  }
+
+  collapseSubtree(node) {
+    node.setAttribute("aria-expanded", "false");
+  }
+
+  isReachableNode(node) {
+    return node.matches(":not([aria-expanded='false'] [role='treeitem'])");
+  }
+
+  isPrintableCharacter(event) {
+    const {key, altKey, ctrlKey, metaKey} = event;
+    return (
+      key.length === 1 &&
+      !altKey && !ctrlKey && !metaKey
+    ) || key === "Backspace";
+  }
+
+  getSearchText(char) {
+    if (this.searchTextTimeout) {
+      clearTimeout(this.searchTextTimeout);
+    }
+    this.searchTextTimeout = setTimeout(() => {
+      this.searchText = "";
+    }, 500);
+    if (char === "Backspace") {
+      this.searchText = this.searchText.slice(0, -1);
+    } else if (this.searchText !== char) {
+      this.searchText = this.searchText + char;
+    }
+    return this.searchText;
+  }
+
+  getNodeIndexBySearchText(text, startIndex) {
+    const {nodes} = this.elements;
+    const targetNodes = [
+      ...nodes.slice(startIndex),
+      ...nodes.slice(0, startIndex),
+    ]
+    const textFormatted = text.toLowerCase();
+    const targetNode = targetNodes.find(node => {
+      const nodeName = node.firstElementChild.textContent.toLowerCase();
+      return nodeName.startsWith(textFormatted) && this.isReachableNode(node);
+    });
+    if (!targetNode) {
+      return -1;
+    }
+    return nodes.indexOf(targetNode);
+  }
+
+  onClickNode(event) {
+    const node = event.target.closest("[role='treeitem']");
+    if (!node) {
+      return;
+    }
+    const nodeIndex = this.elements.nodes.indexOf(node);
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+    this.updateSelectedIndex(nodeIndex);
+    this.updateTabbableIndex(nodeIndex);
+  }
+
+  onKeydownNode(event) {
+    const node = event.target.closest("[role='treeitem']");
+    if (!node) {
+      return;
+    }
+
+    const {key} = event;
+    const index = this.elements.nodes.indexOf(node);
+
+    switch (key) {
+      case "ArrowRight":
+        this.handleArrowRight(node, index);
+        break;
+      case "ArrowLeft":
+        this.handleArrowLeft(node);
+        break;
+      case "ArrowDown":
+        this.handleArrowUpDown(index);
+        break;
+      case "ArrowUp":
+        this.handleArrowUpDown(index, true);
+        break;
+      case "Home":
+        this.handleArrowUpDown(-1);
+        break;
+      case "End":
+        this.handleArrowUpDown(this.elements.nodes.length, true);
+        break;
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        this.updateSelectedIndex(index);
+        break;
+      case "*":
+        this.handleAsterisk(node);
+        break;
+      default:
+        this.handlePrintableCharacter(event, index);
+        break;
+    }
+  }
+
+  handleArrowRight(node, index) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      const nextIndex = index + 1;
+      this.elements.nodes[nextIndex].focus();
+      this.updateTabbableIndex(nextIndex);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+  }
+
+  handleArrowLeft(node) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    const parentNode = node.parentElement.closest("[role='treeitem']");
+
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+      return;
+    }
+
+    if (parentNode) {
+      const parentNodeIndex = this.elements.nodes.indexOf(parentNode);
+      parentNode.focus();
+      this.updateTabbableIndex(parentNodeIndex);
+    }
+  }
+
+  handleArrowUpDown(index, up = false) {
+    const {nodes} = this.elements;
+    const nextFocusableIndex = up ? this.getPreviousFocusableIndex(nodes, index) : this.getNextFocusableIndex(nodes, index);
+
+    if (nextFocusableIndex > -1) {
+      nodes[nextFocusableIndex].focus();
+      this.updateTabbableIndex(nextFocusableIndex);
+    }
+  }
+
+  getNextFocusableIndex(nodes, baseIndex) {
+    return nodes.findIndex((node, index) => {
+      return index > baseIndex && this.isReachableNode(node);
+    })
+  }
+
+  getPreviousFocusableIndex(nodes, baseIndex) {
+    return nodes.findLastIndex((node, index) => {
+      return index < baseIndex && this.isReachableNode(node);
+    })
+  }
+
+  handleAsterisk(node) {
+    const parent = node.parentElement;
+    for (const element of parent.children) {
+      const isCollapsedNode = element.matches("[role='treeitem'][aria-expanded='false']");
+      if (isCollapsedNode) {
+        this.expandSubtree(element);
+      }
+    }
+  }
+
+  handlePrintableCharacter(event, index) {
+    const isPrintableChar = this.isPrintableCharacter(event);
+    if (!isPrintableChar) {
+      return;
+    }
+    const searchText = this.getSearchText(event.key);
+    if (!searchText) {
+      return;
+    }
+    const nodeIndex = this.getNodeIndexBySearchText(searchText, index + 1);
+    if (nodeIndex < 0) {
+      return;
+    }
+    this.elements.nodes[nodeIndex].focus();
+    this.updateTabbableIndex(nodeIndex);
+  }
+
+  updateSelectedIndex(index) {
+    const {nodes} = this.elements;
+    if (index < 0) {
+      return;
+    }
+    if (this.seletedIndex > -1) {
+      nodes[this.seletedIndex].setAttribute("aria-selected", "false");
+    }
+    nodes[index].setAttribute("aria-selected", "true");
+    this.seletedIndex = index;
+  }
+
+  updateTabbableIndex(index) {
+    const {nodes} = this.elements;
+    if (index < 0) {
+      return;
+    }
+    if (this.tabbabledIndex > -1) {
+      nodes[this.tabbabledIndex].setAttribute("tabindex", "-1");
+    }
+    nodes[index].setAttribute("tabindex", "0");
+    this.tabbabledIndex = index;
+  }
+
+  attachEvents() {
+    const {root} = this.elements;
+    root.addEventListener("click", this.onClickTrigger);
+    root.addEventListener("keydown", this.onKeydownItem);
+  }
+
+  initNestedStyle() {
+    for (const subtree of this.elements.subtrees) {
+      const depth = this.getSubtreeDepth(subtree);
+      subtree.style.setProperty("--subtree-depth", depth.toString());
+    }
+  }
+
+  initProps() {
+    const {nodes} = this.elements;
+    const selectedNodeIndex = nodes.findIndex((node) => node.getAttribute("aria-selected") === "true");
+    const tabbableNodeIndex = nodes.findIndex((node) => node.getAttribute("tabindex") === "0");
+    this.seletedIndex = selectedNodeIndex;
+    this.tabbabledIndex = tabbableNodeIndex < 0 ? 0 : tabbableNodeIndex;
+    this.updateSelectedIndex(this.seletedIndex);
+    this.updateTabbableIndex(this.tabbabledIndex);
+  }
+
+  init() {
+    this.initNestedStyle();
+    this.initProps();
+    this.attachEvents();
+  }
+}
+
+const targets = document.querySelectorAll(".js-treeView");
+targets.forEach((componentRoot) => {
+  new TreeView(componentRoot);
+});
+</script>
+
+</body>
+</html>
