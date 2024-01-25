@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツリービュー：リンクツリー</title>
+  <style>
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .TreeView,
+  .TreeView-subtree {
+    padding-inline-start: 0;
+    list-style-type: none;
+  }
+
+  .TreeView-subtree {
+    --subtree-depth: 1;
+  }
+
+  .TreeView-subtree.collapsed {
+    display: none;
+  }
+
+  .TreeView-node:focus-visible {
+    outline: 0;
+  }
+
+  .TreeView-node:focus-visible {
+    outline: 3px solid tomato;
+  }
+
+  .TreeView-node[aria-current="page"] {
+    background-color: cornsilk;
+  }
+
+  .TreeView-node {
+    display: flex;
+    column-gap: 0.25em;
+    padding-inline-start: calc(1.5em * var(--subtree-depth));
+    font-size: 1em;
+    line-height: 1.5;
+    text-decoration: none;
+    color: black;
+  }
+
+  .TreeView-node:hover:not(:has(.TreeView-nodeIcon.branch:hover)) {
+    color: dodgerblue;
+    text-decoration: underline;
+  }
+
+  .TreeView-nodeIcon {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    translate: 0 0.25em;
+    background-color: currentColor;
+    content: "";
+  }
+
+  .TreeView-nodeIcon.leaf {
+    clip-path: polygon(25% 25%, 25% 75%, 75% 75%, 75% 25%);
+  }
+
+  .TreeView-nodeIcon.branch {
+    clip-path: polygon(10% 10%, 10% 90%, 90% 50%);
+    transition: translate 0.1s;
+  }
+
+  .TreeView-node:hover > .TreeView-nodeIcon.branch:not(:hover) {
+    color: black;
+  }
+
+  .TreeView-nodeIcon.branch:hover {
+    background-color: dodgerblue;
+    scale: 1.2;
+  }
+
+  .TreeView-node[aria-expanded="true"] > .TreeView-nodeIcon {
+    rotate: 90deg;
+  }
+  </style>
+</head>
+<body>
+
+<ul role="tree" class="TreeView js-treeView">
+  <li role="none" class="TreeView-item">
+    <a href="#node-1" role="treeitem" aria-owns="subtree-1" aria-expanded="false" tabindex="0" class="TreeView-node">
+      <span class="TreeView-nodeIcon branch"></span>asset
+    </a>
+    <ul id="subtree-1" role="group" class="TreeView-subtree collapsed">
+      <li role="none" class="TreeView-item">
+        <a href="#node-1-1" role="treeitem" aria-owns="subtree-1-1" aria-expanded="false" tabindex="-1" class="TreeView-node">
+          <span class="TreeView-nodeIcon branch"></span>css
+        </a>
+        <ul id="subtree-1-1" role="group" class="TreeView-subtree collapsed">
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-1-1" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>base.css
+            </a>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-1-2" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>main.css
+            </a>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-1-3" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>vendor.css
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li role="none" class="TreeView-item">
+        <a href="#node-1-2" role="treeitem" aria-owns="subtree-1-2" aria-expanded="false" tabindex="-1" class="TreeView-node">
+          <span class="TreeView-nodeIcon branch"></span>js
+        </a>
+        <ul id="subtree-1-2" role="group" class="TreeView-subtree collapsed">
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-2-1" role="treeitem" aria-owns="subtree-1-2-1" aria-expanded="false" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon branch"></span>module
+            </a>
+            <ul id="subtree-1-2-1" role="group" class="TreeView-subtree collapsed">
+              <li role="none" class="TreeView-item">
+                <a href="#node-1-2-1-1" role="treeitem" tabindex="-1" class="TreeView-node">
+                  <span class="TreeView-nodeIcon leaf"></span>analytics.js
+                </a>
+              </li>
+              <li role="none" class="TreeView-item">
+                <a href="#node-1-2-1-2" role="treeitem" tabindex="-1" class="TreeView-node">
+                  <span class="TreeView-nodeIcon leaf"></span>carousel.js
+                </a>
+              </li>
+              <li role="none" class="TreeView-item">
+                <a href="#node-1-2-1-3" role="treeitem" tabindex="-1" class="TreeView-node">
+                  <span class="TreeView-nodeIcon leaf"></span>count.js
+                </a>
+              </li>
+              <li role="none" class="TreeView-item">
+                <a href="#node-1-2-1-4" role="treeitem" tabindex="-1" class="TreeView-node">
+                  <span class="TreeView-nodeIcon leaf"></span>tab.js
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-2-2" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>main.js
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li role="none" class="TreeView-item">
+        <a href="#node-1-3" role="treeitem" aria-owns="subtree-1-3" aria-expanded="false" tabindex="-1" class="TreeView-node">
+          <span class="TreeView-nodeIcon branch"></span>image
+        </a>
+        <ul id="subtree-1-3" role="group" class="TreeView-subtree collapsed">
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-3-1" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>bg.svg
+            </a>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-3-2" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>logo.svg
+            </a>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-3-3" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>main.jpg
+            </a>
+          </li>
+          <li role="none" class="TreeView-item">
+            <a href="#node-1-3-4" role="treeitem" tabindex="-1" class="TreeView-node">
+              <span class="TreeView-nodeIcon leaf"></span>og-default.png
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li role="none" class="TreeView-item">
+    <a href="#node-2" role="treeitem" aria-owns="subtree-2" aria-expanded="false" tabindex="-1" class="TreeView-node">
+      <span class="TreeView-nodeIcon branch"></span>profile
+    </a>
+    <ul id="subtree-2" role="group" class="TreeView-subtree collapsed">
+      <li role="none" class="TreeView-item">
+        <a href="#node-2-1" role="treeitem" tabindex="-1" class="TreeView-node">
+          <span class="TreeView-nodeIcon leaf"></span>index.html
+        </a>
+      </li>
+    </ul>
+  </li>
+  <li role="none" class="TreeView-item">
+    <a href="#node-3" role="treeitem" tabindex="-1" class="TreeView-node">
+      <span class="TreeView-nodeIcon leaf"></span>favicon.ico
+    </a>
+  </li>
+  <li role="none" class="TreeView-item">
+    <a href="#node-4" role="treeitem" tabindex="-1" class="TreeView-node">
+      <span class="TreeView-nodeIcon leaf"></span>index.html
+    </a>
+  </li>
+  <li role="none" class="TreeView-item">
+    <a href="#node-5" role="treeitem" tabindex="-1" class="TreeView-node">
+      <span class="TreeView-nodeIcon leaf"></span>robots.txt
+    </a>
+  </li>
+</ul>
+
+<script>
+class TreeView {
+  constructor(root) {
+    this.elements = {
+      root,
+      nodes: [...root.querySelectorAll("[role='treeitem']")],
+      subtrees: root.querySelectorAll("[role='group']"),
+    }
+
+    this.tabbabledIndex = -1;
+
+    this.searchText = "";
+    this.searchTextTimeout = null;
+
+    this.onClickTrigger = this.onClickNode.bind(this);
+    this.onKeydownItem = this.onKeydownNode.bind(this);
+
+    this.init();
+  }
+
+  getSubtreeDepth(subtree) {
+    let depth = 0;
+    let current = subtree;
+    while (current !== this.elements.root) {
+      if (current.getAttribute("role") === "group") {
+        depth++;
+      }
+      current = current.parentElement;
+    }
+    return depth;
+  }
+
+  expandSubtree(node) {
+    node.setAttribute("aria-expanded", "true");
+    document.querySelector(`#${node.getAttribute("aria-owns").trim()}`).classList.remove("collapsed");
+  }
+
+  collapseSubtree(node) {
+    node.setAttribute("aria-expanded", "false");
+    document.querySelector(`#${node.getAttribute("aria-owns").trim()}`).classList.add("collapsed");
+  }
+
+  isReachableNode(node) {
+    const collapsedNode = node.parentElement.closest(".TreeView-subtree.collapsed");
+    return !collapsedNode;
+  }
+
+  isPrintableCharacter(event) {
+    const {key, altKey, ctrlKey, metaKey} = event;
+    return (
+      key.length === 1 &&
+      !altKey && !ctrlKey && !metaKey
+    ) || key === "Backspace";
+  }
+
+  getSearchText(char) {
+    if (this.searchTextTimeout) {
+      clearTimeout(this.searchTextTimeout);
+    }
+    this.searchTextTimeout = setTimeout(() => {
+      this.searchText = "";
+    }, 500);
+    if (char === "Backspace") {
+      this.searchText = this.searchText.slice(0, -1);
+    } else if (this.searchText !== char) {
+      this.searchText = this.searchText + char;
+    }
+    return this.searchText;
+  }
+
+  getNodeIndexBySearchText(text, startIndex) {
+    const {nodes} = this.elements;
+    const targetNodes = [
+      ...nodes.slice(startIndex),
+      ...nodes.slice(0, startIndex),
+    ]
+    const textFormatted = text.toLowerCase();
+    const targetNode = targetNodes.find(node => {
+      const nodeName = node.textContent.toLowerCase().trim();
+      return nodeName.startsWith(textFormatted) && this.isReachableNode(node);
+    });
+    if (!targetNode) {
+      return -1;
+    }
+    return nodes.indexOf(targetNode);
+  }
+
+  onClickNode(event) {
+    const nodeIcon = event.target.closest(".TreeView-nodeIcon.branch");
+    if (!nodeIcon) {
+      return;
+    }
+    event.preventDefault();
+    const node = nodeIcon.parentElement;
+    const nodeIndex = this.elements.nodes.indexOf(node);
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+    this.updateTabbableIndex(nodeIndex);
+  }
+
+  onKeydownNode(event) {
+    const node = event.target.closest("[role='treeitem']");
+    if (!node) {
+      return;
+    }
+
+    const {key} = event;
+    const index = this.elements.nodes.indexOf(node);
+
+    switch (key) {
+      case "ArrowRight":
+        this.handleArrowRight(node, index);
+        break;
+      case "ArrowLeft":
+        this.handleArrowLeft(node);
+        break;
+      case "ArrowDown":
+        this.handleArrowUpDown(index);
+        break;
+      case "ArrowUp":
+        this.handleArrowUpDown(index, true);
+        break;
+      case "Home":
+        this.handleArrowUpDown(-1);
+        break;
+      case "End":
+        this.handleArrowUpDown(this.elements.nodes.length, true);
+        break;
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        node.click();
+        break;
+      case "*":
+        this.handleAsterisk(node);
+        break;
+      default:
+        this.handlePrintableCharacter(event, index);
+        break;
+    }
+  }
+
+  handleArrowRight(node, index) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    if (ariaExpandedValue === "true") {
+      const nextIndex = index + 1;
+      this.elements.nodes[nextIndex].focus();
+      this.updateTabbableIndex(nextIndex);
+    } else if (ariaExpandedValue === "false") {
+      this.expandSubtree(node);
+    }
+  }
+
+  handleArrowLeft(node) {
+    const ariaExpandedValue = node.getAttribute("aria-expanded");
+    const parentTree = node.closest("[role='group'].TreeView-subtree") || node.closest("[role='tree']");
+    const parentNode = parentTree.parentElement.querySelector("[role='treeitem']");
+
+    if (ariaExpandedValue === "true") {
+      this.collapseSubtree(node);
+      return;
+    }
+
+    if (parentNode) {
+      const parentNodeIndex = this.elements.nodes.indexOf(parentNode);
+      parentNode.focus();
+      this.updateTabbableIndex(parentNodeIndex);
+    }
+  }
+
+  handleArrowUpDown(index, up = false) {
+    const {nodes} = this.elements;
+    const nextFocusableIndex = up ? this.getPreviousFocusableIndex(nodes, index) : this.getNextFocusableIndex(nodes, index);
+
+    if (nextFocusableIndex > -1) {
+      nodes[nextFocusableIndex].focus();
+      this.updateTabbableIndex(nextFocusableIndex);
+    }
+  }
+
+  getNextFocusableIndex(nodes, baseIndex) {
+    return nodes.findIndex((node, index) => {
+      return index > baseIndex && this.isReachableNode(node);
+    })
+  }
+
+  getPreviousFocusableIndex(nodes, baseIndex) {
+    return nodes.findLastIndex((node, index) => {
+      return index < baseIndex && this.isReachableNode(node);
+    })
+  }
+
+  handleAsterisk(node) {
+    const parentTree = node.closest("[role='group'].TreeView-subtree") || node.closest("[role='tree']");
+    for (const item of parentTree.children) {
+      const node = item.firstElementChild;
+      if (node.getAttribute("aria-expanded") === "false") {
+        this.expandSubtree(node);
+      }
+    }
+  }
+
+  handlePrintableCharacter(event, index) {
+    const isPrintableChar = this.isPrintableCharacter(event);
+    if (!isPrintableChar) {
+      return;
+    }
+    const searchText = this.getSearchText(event.key);
+    if (!searchText) {
+      return;
+    }
+    const nodeIndex = this.getNodeIndexBySearchText(searchText, index + 1);
+    if (nodeIndex < 0) {
+      return;
+    }
+    this.elements.nodes[nodeIndex].focus();
+    this.updateTabbableIndex(nodeIndex);
+  }
+
+  updateTabbableIndex(index) {
+    const {nodes} = this.elements;
+    if (index < 0) {
+      return;
+    }
+    if (this.tabbabledIndex > -1) {
+      nodes[this.tabbabledIndex].setAttribute("tabindex", "-1");
+    }
+    nodes[index].setAttribute("tabindex", "0");
+    this.tabbabledIndex = index;
+  }
+
+  attachEvents() {
+    const {root} = this.elements;
+    root.addEventListener("click", this.onClickTrigger);
+    root.addEventListener("keydown", this.onKeydownItem);
+  }
+
+  initNestedStyle() {
+    for (const subtree of this.elements.subtrees) {
+      const depth = this.getSubtreeDepth(subtree);
+      subtree.style.setProperty("--subtree-depth", depth.toString());
+    }
+  }
+
+  initProps() {
+    const {nodes} = this.elements;
+    const tabbableNodeIndex = nodes.findIndex((node) => node.getAttribute("tabindex") === "0");
+    this.tabbabledIndex = tabbableNodeIndex < 0 ? 0 : tabbableNodeIndex;
+    this.updateTabbableIndex(this.tabbabledIndex);
+  }
+
+  init() {
+    this.initNestedStyle();
+    this.initProps();
+    this.attachEvents();
+  }
+}
+
+const targets = document.querySelectorAll(".js-treeView");
+targets.forEach((componentRoot) => {
+  new TreeView(componentRoot);
+});
+</script>
+
+</body>
+</html>
